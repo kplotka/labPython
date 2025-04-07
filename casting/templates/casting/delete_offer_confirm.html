@@ -1,0 +1,13 @@
+{% extends 'casting/base.html' %}
+
+{% block title %}Usuń ofertę: {{ offer.title }}{% endblock %}
+
+{% block content %}
+  <h1>Usuń ofertę: {{ offer.title }}</h1>
+  <p>Czy na pewno chcesz usunąć tę ofertę? Ta operacja jest nieodwracalna.</p>
+  <form method="post">
+    {% csrf_token %}
+    <input type="submit" value="Tak, usuń ofertę">
+  </form>
+  <a class="button" href="{% url 'offer_detail' offer.id %}">Anuluj</a>
+{% endblock %}

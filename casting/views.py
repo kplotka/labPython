@@ -150,6 +150,18 @@ def edit_offer(request, offer_id):
     return render(request, 'casting/edit_offer.html', {'form': form, 'offer': offer})
 
 @login_required
+def delete_offer(request, offer_id):
+    try:
+        director_profile = request.user.director_profile
+    except DirectorProfile.DoesNotExist:
+        return redirect('home')
+    offer = get_object_or_404(CastingOffer, id=offer_id, director=director_profile)
+    if request.method == "POST":
+        offer.delete()
+        return redirect('profile')
+    return render(request, 'casting/delete_offer_confirm.html', {'offer': offer})
+
+@login_required
 def view_applications(request, offer_id):
     offer = get_object_or_404(CastingOffer, id=offer_id)
     try:
@@ -178,3 +190,13 @@ def update_application_status(request, application_id, new_status):
         application.save()
         return redirect('view_applications', offer_id=application.offer.id)
     return render(request, 'casting/update_application_status.html', {'application': application, 'new_status': new_status})
+
+@login_required
+def model_profile_detail(request, profile_id):
+    from django.shortcuts import get_object_or_404
+    profile = get_object_or_404(ModelProfile, id=profile_id)
+    try:
+        director_profile = request.user.director_profile
+    except DirectorProfile.DoesNotExist:
+        return redirect('home')
+    return render(request, 'casting/model_profile_detail.html', {'profile': profile})

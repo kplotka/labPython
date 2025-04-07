@@ -1,51 +1,31 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Lista ofert castingu</title>
-</head>
-<body>
-    <header>
-        <nav>
-            <a href="{% url 'home' %}">Strona Główna</a> |
-            {% if user.is_authenticated %}
-                {% if user.director_profile %}
-                    <a href="{% url 'add_casting_offer' %}">Dodaj ofertę</a> |
-                {% endif %}
-                <a href="{% url 'profile' %}">Profil</a> |
-                <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit">Wyloguj</button>
-                </form>
-            {% else %}
-                <a href="{% url 'register' %}">Rejestracja</a> |
-                <a href="{% url 'login' %}">Logowanie</a>
-            {% endif %}
-        </nav>
-    </header>
+{% extends 'casting/base.html' %}
 
-    <h1>Lista ofert castingu</h1>
-    {% if offers %}
-        <ul>
-        {% for offer in offers %}
-            <li>
-                <a href="{% url 'offer_detail' offer.id %}">{{ offer.title }}</a> – {{ offer.location }}
-                {% if user.is_authenticated %}
-                    {% if user.model_profile %}
-                        {% if offer.id in applied_offer_ids %}
-                            <span>Już aplikowałeś</span>
-                        {% else %}
-                            <a href="{% url 'apply_offer' offer.id %}">Aplikuj</a>
-                        {% endif %}
-                    {% elif user.director_profile %}
-                        <a href="{% url 'view_applications' offer.id %}">Zobacz aplikacje</a>
-                    {% endif %}
+{% block title %}Lista ofert castingu{% endblock %}
+
+{% block content %}
+  <h1>Lista ofert castingu</h1>
+  {% if offers %}
+    <ul>
+      {% for offer in offers %}
+        <li>
+          <a href="{% url 'offer_detail' offer.id %}">{{ offer.title }}</a> – {{ offer.location }}
+          {% if user.is_authenticated %}
+            {% if user.model_profile %}
+              {% if offer.id in applied_offer_ids %}
+                <span>(zaaplikowano)</span>
+              {% else %}
+                <a class="button" href="{% url 'apply_offer' offer.id %}">Aplikuj</a>
+              {% endif %}
+            {% elif user.director_profile %}
+                {% if offer.director == user.director_profile %}
+                  <a class="button" href="{% url 'view_applications' offer.id %}">Zobacz aplikacje</a>
                 {% endif %}
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>Brak ofert castingu.</p>
-    {% endif %}
-</body>
-</html>
+            {% endif %}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Brak ofert castingu.</p>
+  {% endif %}
+{% endblock %}

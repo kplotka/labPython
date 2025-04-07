@@ -1,22 +1,13 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Edycja profilu</title>
-</head>
-<body>
-    <header>
-        <nav>
-            <a href="{% url 'home' %}">Strona Główna</a> |
-            <a href="{% url 'profile' %}">Profil</a>
-        </nav>
-    </header>
-    <h1>Edycja profilu</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Zapisz zmiany</button>
-    </form>
-    <a href="{% url 'profile' %}">Powrót do profilu</a>
-</body>
-</html>
+{% extends 'casting/base.html' %}
+
+{% block title %}Edytuj profil{% endblock %}
+
+{% block content %}
+  <h1>Edycja profilu</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Zapisz zmiany">
+  </form>
+  <a href="{% url 'profile' %}">Powrót do profilu</a>
+{% endblock %}

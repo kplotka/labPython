@@ -1,16 +1,13 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Dodaj ofertę castingu</title>
-</head>
-<body>
-    <h1>Dodaj ofertę castingu</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Dodaj ofertę</button>
-    </form>
-    <a href="{% url 'home' %}">Powrót do strony głównej</a>
-</body>
-</html>
+{% extends 'casting/base.html' %}
+
+{% block title %}Dodaj ofertę castingu{% endblock %}
+
+{% block content %}
+  <h1>Dodaj ofertę castingu</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Dodaj ofertę">
+  </form>
+  <a href="{% url 'offers_list' %}">Powrót do listy ofert</a>
+{% endblock %}

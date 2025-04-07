@@ -1,47 +1,46 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Profil modela</title>
-</head>
-<body>
-    <header>
-        <nav>
-            <a href="{% url 'home' %}">Strona Główna</a> |
-            <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit">Wyloguj</button>
-            </form>
-        </nav>
-    </header>
+{% extends 'casting/base.html' %}
 
-    <h1>Profil Modela</h1>
-    <p><strong>Imię i nazwisko:</strong> {{ profile.full_name }}</p>
-    <p><strong>Wiek:</strong> {{ profile.age }}</p>
-    <p><strong>Wzrost:</strong> {{ profile.height }}</p>
-    <p><strong>Waga:</strong> {{ profile.weight }}</p>
-    <p><strong>Wymiary:</strong> {{ profile.measurements }}</p>
-    <p><strong>Portfolio:</strong> <a href="{{ profile.portfolio_url }}">{{ profile.portfolio_url }}</a></p>
-    <p><strong>Bio:</strong> {{ profile.bio }}</p>
-    <p><a href="{% url 'edit_profile' %}">Edytuj profil</a></p>
+{% block title %}Profil Modela{% endblock %}
 
-    <h2>Twoje aplikacje:</h2>
-    {% if applications %}
-      <ul>
-        {% for app in applications %}
-          <li>
-             Oferta: <a href="{% url 'offer_detail' app.offer.id %}">{{ app.offer.title }}</a> <br>
-             Status: {{ app.status }}<br>
-             Wiadomość: {{ app.message|default:"Brak" }}<br>
-             {% if app.status == "Accepted" %}
-               <p><strong>Twoja aplikacja została zaakceptowana.</strong></p>
-               <p>Skontaktuj się z casting director: {{ app.offer.director.user.email }}</p>
-             {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
+{% block content %}
+<div class="profile-card" style="display:flex; gap:2rem; align-items:center; margin-bottom:2rem;">
+  <div class="profile-picture" style="flex-shrink:0;">
+    {% if profile.profile_picture %}
+      <img src="{{ profile.profile_picture.url }}" alt="Zdjęcie profilowe" style="width:150px; height:150px; object-fit:cover; border-radius:50%;">
     {% else %}
-      <p>Nie złożyłeś jeszcze żadnej aplikacji.</p>
+      <img src="/static/default-profile.png" alt="Brak zdjęcia" style="width:150px; height:150px; object-fit:cover; border-radius:50%;">
     {% endif %}
-</body>
-</html>
+  </div>
+  <div class="profile-info">
+    <h2 style="margin-bottom:0.5rem;">{{ profile.full_name }}</h2>
+    <p><strong>Wiek:</strong> {{ profile.age|default:"-" }}</p>
+    <p><strong>Wzrost:</strong> {{ profile.height|default:"-" }}</p>
+    <p><strong>Waga:</strong> {{ profile.weight|default:"-" }}</p>
+    <p><strong>Wymiary:</strong> {{ profile.measurements|default:"-" }}</p>
+    {% if profile.portfolio_url %}
+      <p><strong>Portfolio:</strong> <a href="{{ profile.portfolio_url }}" target="_blank">{{ profile.portfolio_url }}</a></p>
+    {% endif %}
+    <p>{{ profile.bio }}</p>
+    <a href="{% url 'edit_profile' %}" class="button">Edytuj profil</a>
+  </div>
+</div>
+<div class="applications-section">
+  <h3>Twoje aplikacje</h3>
+  {% if applications %}
+    <ul style="list-style:none; padding:0;">
+      {% for app in applications %}
+        <li style="padding:1rem; border-bottom:1px solid #eee;">
+          <p><strong>Oferta:</strong> <a href="{% url 'offer_detail' app.offer.id %}">{{ app.offer.title }}</a></p>
+          <p><strong>Status:</strong> {{ app.status }}</p>
+          <p><strong>Wiadomość:</strong> {{ app.message|default:"Brak" }}</p>
+          {% if app.status == "Accepted" and app.offer.director %}
+            <p style="color:#0070f3;"><strong>Aplikacja zaakceptowana.</strong> Skontaktuj się z: {{ app.offer.director.user.email }}</p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Nie złożyłeś jeszcze żadnej aplikacji.</p>
+  {% endif %}
+</div>
+{% endblock %}

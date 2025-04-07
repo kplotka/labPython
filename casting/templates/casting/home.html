@@ -1,30 +1,20 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Strona Główna Casting Hub</title>
-</head>
-<body>
-    <header>
-        <nav>
-            <a href="{% url 'home' %}">Strona Główna</a> |
-            <a href="{% url 'offers_list' %}">Oferty Castingu</a> |
-            {% if user.is_authenticated %}
-                {% if user.director_profile %}
-                    <a href="{% url 'add_casting_offer' %}">Dodaj ofertę</a> |
-                {% endif %}
-                <a href="{% url 'profile' %}">Profil</a> |
-                <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit">Wyloguj</button>
-                </form>
-            {% else %}
-                <a href="{% url 'register' %}">Rejestracja</a> |
-                <a href="{% url 'login' %}">Logowanie</a>
-            {% endif %}
-        </nav>
-    </header>
-    <h1>Witamy w Casting Hub!</h1>
-    <p>To jest strona główna projektu Casting Hub.</p>
-</body>
-</html>
+{% extends 'casting/base.html' %}
+
+{% block title %}Strona Główna Casting Hub{% endblock %}
+
+{% block content %}
+  <h1 style="font-size: 5rem; letter-spacing: 0.1em;">CastingHub</h1>
+  <p style="font-size: 2rem;">Potrzebujesz modeli?</p>
+
+  <p>Zarejestruj się jako Director!</p>
+  <p>Dodawaj swoje oferty, kierowane do modeli</p>
+  <p>Przeglądaj profile modeli chętnych do pracy w twoim projekcie</p>
+  <p>Z łatwością akceptuj aplikacje modeli oraz łap kontakty!</p>
+
+  <p style="font-size: 2rem;">Jesteś modelem?</p>
+  <p>Zarejestruj się jako Model!</p>
+  <p>Przeglądaj oferty bezpośrednio od Directorów</p>
+  <p>Aplikuj do projektów</p>
+  <p>Po zatwierdzeniu Twojej aplikacji łap kontakty!</p>
+
+{% endblock %}

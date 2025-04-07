@@ -4,5 +4,5 @@ class CastingConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'casting'
 
-    def ready(self):
-        import casting.signals
+    # def ready(self):
+    #     import casting.signals

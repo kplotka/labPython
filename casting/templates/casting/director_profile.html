@@ -1,39 +1,43 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Profil Casting Director</title>
-</head>
-<body>
-    <header>
-        <nav>
-            <a href="{% url 'home' %}">Strona Główna</a> |
-            <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit">Wyloguj</button>
-            </form>
-        </nav>
-    </header>
+{% extends 'casting/base.html' %}
 
-    <h1>Profil Casting Director</h1>
-    <p><strong>Imię i nazwisko:</strong> {{ profile.full_name }}</p>
-    <p><strong>Nazwa agencji:</strong> {{ profile.agency_name }}</p>
-    <p><strong>Adres agencji:</strong> {{ profile.agency_address }}</p>
-    <p><strong>Bio:</strong> {{ profile.bio }}</p>
-    <p><a href="{% url 'edit_profile' %}">Edytuj profil</a></p>
+{% block title %}Profil Casting Director{% endblock %}
 
-    <h2>Twoje oferty castingu:</h2>
-    {% if offers_with_counts %}
-      <ul>
-        {% for offer, count in offers_with_counts %}
-          <li>
-             <a href="{% url 'offer_detail' offer.id %}">{{ offer.title }}</a> – Aplikacje: {{ count }}
-             <a href="{% url 'edit_offer' offer.id %}">Edytuj ofertę</a>
-          </li>
-        {% endfor %}
-      </ul>
+{% block content %}
+<div class="profile-card" style="display:flex; gap:2rem; align-items:center; margin-bottom:2rem;">
+  <div class="profile-picture" style="flex-shrink:0;">
+    {% if profile.profile_picture %}
+      <img src="{{ profile.profile_picture.url }}" alt="Zdjęcie profilowe" style="width:150px; height:150px; object-fit:cover; border-radius:50%;">
     {% else %}
-      <p>Nie dodałeś jeszcze żadnej oferty castingu.</p>
+      <img src="/static/default-director.png" alt="Brak zdjęcia" style="width:150px; height:150px; object-fit:cover; border-radius:50%;">
     {% endif %}
-</body>
-</html>
+  </div>
+  <div class="profile-info">
+    <h2 style="margin-bottom:0.5rem;">{{ profile.full_name }}</h2>
+    <p><strong>Nazwa agencji:</strong> {{ profile.agency_name|default:"-" }}</p>
+    <p><strong>Adres agencji:</strong> {{ profile.agency_address|default:"-" }}</p>
+    <p><strong>Dane kontaktowe:</strong> {{ profile.contact_email|default:"-" }} | {{ profile.contact_phone|default:"-" }}</p>
+    <p>{{ profile.bio }}</p>
+    <a href="{% url 'edit_profile' %}" class="button">Edytuj profil</a>
+  </div>
+</div>
+<div class="offers-section">
+  <h3>Twoje oferty castingu</h3>
+  {% if offers_with_counts %}
+    <ul style="list-style:none; padding:0;">
+      {% for offer, count in offers_with_counts %}
+        <li style="padding:1rem; border-bottom:1px solid #eee;">
+          <h4 style="margin-bottom:0.5rem;"><a href="{% url 'offer_detail' offer.id %}" style="color:#0070f3; text-decoration:none;">{{ offer.title }}</a></h4>
+          <p><strong>Lokalizacja:</strong> {{ offer.location }}</p>
+          <p><strong>Aplikacje:</strong> {{ count }}</p>
+          <div style="margin-top:0.5rem;">
+            <a href="{% url 'edit_offer' offer.id %}" class="button" style="margin-right:0.5rem;">Edytuj ofertę</a>
+            <a href="{% url 'view_applications' offer.id %}" class="button">Zobacz aplikacje</a>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Nie dodałeś jeszcze żadnej oferty castingu.</p>
+  {% endif %}
+</div>
+{% endblock %}

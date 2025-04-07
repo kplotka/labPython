@@ -1,0 +1,17 @@
+{% extends 'casting/base.html' %}
+
+{% block title %}Profil Modela{% endblock %}
+
+{% block content %}
+  <h1>Profil Modela: {{ profile.full_name }}</h1>
+  {% if profile.profile_picture %}
+    <img src="{{ profile.profile_picture.url }}" alt="Zdjęcie profilowe" style="max-width:150px;">
+  {% endif %}
+  <p><strong>Wiek:</strong> {{ profile.age }}</p>
+  <p><strong>Wzrost:</strong> {{ profile.height }}</p>
+  <p><strong>Waga:</strong> {{ profile.weight }}</p>
+  <p><strong>Wymiary:</strong> {{ profile.measurements }}</p>
+  <p><strong>Portfolio:</strong> <a href="{{ profile.portfolio_url }}">{{ profile.portfolio_url }}</a></p>
+  <p><strong>Bio:</strong> {{ profile.bio }}</p>
+  <a href="{% url 'view_applications' offer_id=profile.applications.first.offer.id %}">Powrót do aplikacji</a>
+{% endblock %}
