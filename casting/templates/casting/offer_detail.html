@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Szczegóły oferty: {{ offer.title }}</title>
+</head>
+<body>
+    <h1>{{ offer.title }}</h1>
+    <p><strong>Data:</strong> {{ offer.offer_date }}</p>
+    <p><strong>Lokalizacja:</strong> {{ offer.location }}</p>
+    <p><strong>Opis:</strong> {{ offer.description }}</p>
+    <p><strong>Wymagania:</strong> {{ offer.requirements }}</p>
+
+    {% if user.is_authenticated and user.model_profile %}
+        {% if already_applied %}
+            <p>Już aplikowałeś na tę ofertę.</p>
+        {% else %}
+            <a href="{% url 'apply_offer' offer.id %}">Aplikuj na tę ofertę</a>
+        {% endif %}
+    {% endif %}
+
+    <a href="{% url 'offers_list' %}">Powrót do listy ofert</a>
+</body>
+</html>

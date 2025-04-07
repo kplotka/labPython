@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Aplikacje dla oferty: {{ offer.title }}</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'home' %}">Strona Główna</a> |
+            <a href="{% url 'offers_list' %}">Oferty Castingu</a> |
+            <a href="{% url 'profile' %}">Profil</a>
+        </nav>
+    </header>
+    <h1>Aplikacje dla oferty: {{ offer.title }}</h1>
+    {% if applications %}
+        <ul>
+            {% for app in applications %}
+                <li>
+                    <strong>{{ app.model_profile.full_name }}</strong> – {{ app.applied_at|date:"Y-m-d H:i" }}<br>
+                    Wiadomość: {{ app.message|default:"Brak" }}<br>
+                    Status: {{ app.status }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Brak aplikacji dla tej oferty.</p>
+    {% endif %}
+</body>
+</html>

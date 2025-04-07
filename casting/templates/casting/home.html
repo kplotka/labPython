@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Strona Główna Casting Hub</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'home' %}">Strona Główna</a> |
+            <a href="{% url 'offers_list' %}">Oferty Castingu</a> |
+            {% if user.is_authenticated %}
+                {% if user.director_profile %}
+                    <a href="{% url 'add_casting_offer' %}">Dodaj ofertę</a> |
+                {% endif %}
+                <a href="{% url 'profile' %}">Profil</a> |
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Wyloguj</button>
+                </form>
+            {% else %}
+                <a href="{% url 'register' %}">Rejestracja</a> |
+                <a href="{% url 'login' %}">Logowanie</a>
+            {% endif %}
+        </nav>
+    </header>
+    <h1>Witamy w Casting Hub!</h1>
+    <p>To jest strona główna projektu Casting Hub.</p>
+</body>
+</html>

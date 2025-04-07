@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil Casting Director</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'home' %}">Strona Główna</a> |
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Wyloguj</button>
+            </form>
+        </nav>
+    </header>
+
+    <h1>Profil Casting Director</h1>
+    <p><strong>Imię i nazwisko:</strong> {{ profile.full_name }}</p>
+    <p><strong>Nazwa agencji:</strong> {{ profile.agency_name }}</p>
+    <p><strong>Adres agencji:</strong> {{ profile.agency_address }}</p>
+    <p><strong>Bio:</strong> {{ profile.bio }}</p>
+    <p><a href="{% url 'edit_profile' %}">Edytuj profil</a></p>
+
+    <h2>Twoje oferty castingu:</h2>
+    {% if offers_with_counts %}
+      <ul>
+        {% for offer, count in offers_with_counts %}
+          <li>
+             <a href="{% url 'offer_detail' offer.id %}">{{ offer.title }}</a> – Aplikacje: {{ count }}
+             <a href="{% url 'edit_offer' offer.id %}">Edytuj ofertę</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>Nie dodałeś jeszcze żadnej oferty castingu.</p>
+    {% endif %}
+</body>
+</html>
