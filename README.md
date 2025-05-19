@@ -8,8 +8,8 @@ Projekt polega na klasyfikacji koktajli na trzy typy: **słodki**, **słodko-kwa
 ├── preprocessing.py # Wczytanie i przetwarzanie danych z cocktails.csv
 ├── models.py # Definicje trzech wariantów sieci neuronowych
 ├── train_and_evaluate.py # Trening, ewaluacja i wizualizacja wyników
-├── cocktails.csv # Zbiór danych wejściowych (gotowy plik)
-└── __init__.py # Plik techniczny (może być pusty)
+├── cocktails.csv # Zbiór danych wejściowych
+└── __init__.py # Plik techniczny
 ```
 
 ## Dane wejściowe
