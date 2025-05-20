@@ -1,69 +1,100 @@
 # Klasyfikacja koktajli na podstawie składników
 
-Projekt polega na klasyfikacji koktajli na trzy typy: **słodki**, **słodko-kwaśny** oraz **wytrawny**, na podstawie ich składników. Został zrealizowany przy użyciu klasycznych sieci neuronowych (`MLPClassifier`) dostępnych w bibliotece `scikit-learn`.
+Projekt polega na rozwiązaniu dwóch niezależnych problemów klasyfikacyjnych z wykorzystaniem sztucznych sieci neuronowych (MLP) przy użyciu `scikit-learn`.
 
-## Struktura Projektu
+---
+
+## Problem 1 – Klasyfikacja typu smakowego
+
+### Cel:
+Na podstawie składników koktajlu określić, czy jest on:
+- słodki
+- słodko-kwaśny
+- wytrawny
+
+### Dane wejściowe:
+Składniki z kolumn `Składnik 1–4` zostały zakodowane w postaci one-hot.
+
+### Dane wyjściowe:
+Kolumna `Typ` zawierająca typ smakowy.
+
+### Modele:
+- Model 1: 1 warstwa ukryta (32 neurony), `relu`
+- Model 2: 2 warstwy (64, 32), `tanh`
+- Model 3: 3 warstwy (128, 64, 32), `relu`, `alpha=0.01`
+
+### Wyniki:
+Każdy model został oceniony na podstawie:
+- Accuracy (dokładność na zbiorze testowym)
+- Macierzy pomyłek (confusion matrix)
+
+**Najlepszy model**: Model 1 (1x32 relu) – najwyższa dokładność i stabilne wyniki
+
+---
+
+## Problem 2 – Klasyfikacja poziomu alkoholu (ABV)
+
+### Cel:
+Na podstawie składników określić, czy koktajl jest:
+- **low ABV** (lekki)
+- **high ABV** (mocny)
+
+### Dane wejściowe:
+Te same składniki zakodowane one-hot.
+
+### Dane wyjściowe:
+Ręcznie dodana kolumna `Abv` (low / high), oceniona na podstawie wiedzy barmańskiej o składnikach.
+
+### Modele:
+- Model 1: 1 warstwa (16 neuronów), `logistic`
+- Model 2: 2 warstwy (32, 16), `relu`, `solver=lbfgs`
+- Model 3: 3 warstwy (64, 32, 16), `tanh`, `alpha=0.001`
+
+### Wyniki:
+Analogiczne jak w Problemie 1.
+
+**Najlepszy model**: Model 3 (3x tanh + alpha=0.001)
+
+---
+
+## Metryki skuteczności
+
+Dla każdego modelu zostały zaprezentowane:
+- **Accuracy**
+- **Macierz błędów (confusion matrix)**
+
+Ze względu na wykorzystanie `MLPClassifier`, krzywe uczenia i test loss nie zostały wygenerowane, co jest zgodne z ograniczeniami tej biblioteki.
+
+---
+
+## Wnioski
+
+Projekt pokazuje, że:
+- Składniki koktajli zawierają wystarczająco dużo informacji, aby skutecznie klasyfikować typ smakowy i poziom alkoholu,
+- Nawet proste modele MLP mogą dawać wysoką skuteczność,
+- Architektura modelu (liczba warstw, aktywacje, solver) ma wyraźny wpływ na jakość predykcji.
+
+---
+
+## Struktura projektu
 
 ```
-├── preprocessing.py # Wczytanie i przetwarzanie danych z cocktails.csv
-├── models.py # Definicje trzech wariantów sieci neuronowych
-├── train_and_evaluate.py # Trening, ewaluacja i wizualizacja wyników
-├── cocktails.csv # Zbiór danych wejściowych
-└── __init__.py # Plik techniczny
+├── preprocessing.py
+├── problem1_models.py
+├── problem1_train.py
+├── problem2_models.py
+├── problem2_train.py
+├── cocktails.csv
+├── README.md
 ```
 
-## Dane wejściowe
 
-Zbiór danych `cocktails.csv` zawiera:
-- nazwę koktajlu,
-- 1–4 składniki,
-- etykietę typu koktajlu (klasa).
+---
 
-Dane są przetwarzane do postaci binarnej (one-hot) — każdy składnik jest reprezentowany jako osobna cecha wejściowa (kolumna 0/1).
+## ✅ Wymagania
 
-## Modele
-
-W projekcie zdefiniowano trzy warianty klasycznej sieci neuronowej typu MLP:
-
-- **Model 1:** jedna warstwa ukryta (32 neurony, `relu`)
-- **Model 2:** dwie warstwy ukryte (64 i 32 neurony, `tanh`)
-- **Model 3:** trzy warstwy ukryte (128, 64, 32 neurony, `relu`, `alpha=0.01`)
-
-Każdy model trenowany jest na tym samym zbiorze treningowym.
-
-## Wyniki
-
-Każdy model został oceniony na zbiorze testowym, a wyniki przedstawiono jako:
-
-- dokładność klasyfikacji (w procentach),
-- macierz pomyłek (confusion matrix).
-
-Przykładowe wyniki:
-
-```
-Model 1 (1x32 relu) - Test Accuracy: 93.00%
-Model 2 (2x tanh) - Test Accuracy: 89.00%
-Model 3 (3x relu, alpha=0.01) - Test Accuracy: 91.00%
-```
-
-## Uruchomienie
-
-1. Upewnij się, że plik `cocktails.csv` znajduje się w tym samym folderze co pliki `.py`.
-2. Uruchom program:
-```bash
-python train_and_evaluate.py
-```
-
-## Wymagane biblioteki
-
-- `pandas`
-- `numpy`
+- `Python 3.x`
 - `scikit-learn`
+- `pandas`
 - `matplotlib`
 - `seaborn`
-
-Można je zaintsalować za pomocą:
-
-```bash
-pip install pandas numpy scikit-learn matplotlib seaborn
-```

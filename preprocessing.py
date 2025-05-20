@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MultiLabelBinarizer, LabelEncoder
 
-def load_and_preprocess_data(csv_path):
+def load_data_and_labels(csv_path, label_column):
     df = pd.read_csv(csv_path)
     ingredient_cols = ["Składnik 1", "Składnik 2", "Składnik 3", "Składnik 4"]
     df[ingredient_cols] = df[ingredient_cols].fillna("")
@@ -14,8 +14,8 @@ def load_and_preprocess_data(csv_path):
     mlb = MultiLabelBinarizer()
     X = mlb.fit_transform(df["All_Ingredients"])
     label_encoder = LabelEncoder()
-    y = label_encoder.fit_transform(df["Typ"])
+    y = label_encoder.fit_transform(df[label_column])
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=42
     )
-    return X_train, X_test, y_train, y_test, mlb.classes_, label_encoder
+    return X_train, X_test, y_train, y_test
