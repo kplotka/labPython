@@ -5,7 +5,9 @@ exit_prompt_rects = {}
 def draw_exit_prompt(screen, font):
     dialog = pygame.Rect(screen.get_width() // 2 - 150, 200, 300, 150)
     pygame.draw.rect(screen, (255, 255, 200), dialog)
-    screen.blit(font.render("Czy chcesz zapisać grę przed wyjściem?", True, (0, 0, 0)), (dialog.x + 10, dialog.y + 20))
+    small_font = pygame.font.SysFont("arial", 22)
+    screen.blit(small_font.render("Czy chcesz zapisać grę", True, (0, 0, 0)), (dialog.x + 30, dialog.y + 20))
+    screen.blit(small_font.render("przed wyjściem?", True, (0, 0, 0)), (dialog.x + 30, dialog.y + 50))
 
     yes_btn = pygame.Rect(dialog.x + 30, dialog.y + 80, 100, 40)
     no_btn = pygame.Rect(dialog.x + 170, dialog.y + 80, 100, 40)

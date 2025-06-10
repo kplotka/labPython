@@ -52,7 +52,9 @@ while running:
     pygame.display.flip()
 
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT and state["screen_state"] == "game":
+            state["confirm_exit"] = True
+        elif event.type == pygame.QUIT:
             running = False
 
         if state["screen_state"] == "main_menu":
