@@ -8,8 +8,6 @@ class Grid:
         self.col_hints = col_hints
         self.grid = [[0 for _ in range(cols)] for _ in range(rows)]
 
-        max_width = 600
-        max_height = 600
         self.cell_size = min(
             (900 - 200) // cols,
             (700 - 200) // rows,
