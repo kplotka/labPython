@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Twój bukiet{% endblock %}
+
+{% block content %}
+<h2>Twój bukiet</h2>
+
+<div id="saveMessage" style="color: green; margin-bottom: 10px;"></div>
+
+{% if user.is_authenticated and bouquet %}
+<form onsubmit="saveBouquet(event)" style="margin-bottom: 20px;">
+    <label>Nazwa bukietu:
+        <input type="text" id="bouquetName" required>
+    </label>
+    <button type="submit">Zapisz bukiet</button>
+</form>
+{% endif %}
+
+<div class="bouquet-container" style="display: flex; flex-wrap: wrap; gap: 10px;">
+    {% for flower, rotate in bouquet %}
+        <div class="flower-card" style="transform: rotate({{ rotate }}deg); display: flex; flex-direction: column; align-items: center; border: 1px dashed #aaa; padding: 10px; border-radius: 8px; background: #fefefe;">
+            {% if flower.icon %}
+                <img src="{{ flower.icon.url }}" alt="{{ flower.name }}" width="80">
+            {% endif %}
+            <p><strong>{{ flower.name }}</strong></p>
+            <p style="font-size: 0.9em;">{{ flower.meaning }}</p>
+
+            <form onsubmit="removeFromBouquet(event, {{ flower.id }})" style="margin-top: 10px;">
+                <button type="submit">Usuń</button>
+            </form>
+        </div>
+    {% endfor %}
+</div>
+
+{% if bouquet|length > 0 %}
+    <form onsubmit="removeAllFromBouquet(event)" style="margin-top: 20px;">
+        <button type="submit">Wyczyść bukiet</button>
+    </form>
+{% else %}
+    <p>Twój bukiet jest pusty. Wróć do <a href="{% url 'planner' %}">planera</a>, aby dodać kwiaty!</p>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function removeFromBouquet(event, flowerId) {
+    event.preventDefault();
+    fetch(`/usun-z-bukietu/${flowerId}/`, {
+        method: "POST",
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            location.reload();
+        } else {
+            alert(data.error || "Coś poszło nie tak.");
+        }
+    });
+}
+
+function removeAllFromBouquet(event) {
+    event.preventDefault();
+    fetch("{% url 'clear_bouquet' %}", {
+        method: "POST",
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(() => location.reload());
+}
+
+function saveBouquet(event) {
+    event.preventDefault();
+    const name = document.getElementById("bouquetName").value;
+
+    fetch("{% url 'save_bouquet' %}", {
+        method: "POST",
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: "name=" + encodeURIComponent(name)
+    })
+    .then(response => response.json())
+    .then(data => {
+        const messageBox = document.getElementById("saveMessage");
+        if (data.message) {
+            messageBox.textContent = data.message;
+            messageBox.style.color = "green";
+            fetch("{% url 'clear_bouquet' %}")
+                .then(() => setTimeout(() => location.reload(), 500));
+        } else {
+            messageBox.textContent = data.error || "Coś poszło nie tak.";
+            messageBox.style.color = "red";
+        }
+    });
+}
+</script>
+{% endblock %}

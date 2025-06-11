@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Słownik Kwiatów{% endblock %}
+
+{% block content %}
+<h2>Słownik kwiatów</h2>
+{% for flower in flowers %}
+    <div class="flower">
+        <h3>{{ flower.name }}</h3>
+        <p>{{ flower.meaning }}</p>
+        {% if flower.icon %}
+            <img src="{{ flower.icon.url }}" alt="{{ flower.name }}" width="100">
+        {% endif %}
+    </div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Moje bukiety{% endblock %}
+
+{% block content %}
+<h2>Twoje zapisane bukiety</h2>
+
+{% if bouquets %}
+    {% for bouquet in bouquets %}
+        <div style="margin-bottom: 30px; border-bottom: 1px solid #ccc; padding-bottom: 15px;">
+            <p>
+                <strong>{{ bouquet.name }}</strong>
+                <em style="font-size: 0.9em; color: #666;">(zapisany: {{ bouquet.created_at|date:"Y-m-d H:i" }})</em>
+            </p>
+
+            <ul>
+                {% for flower in bouquet.flowers.all %}
+                    <li>{{ flower.name }} – {{ flower.meaning }}</li>
+                {% endfor %}
+            </ul>
+
+            <form onsubmit="deleteBouquet(event, {{ bouquet.id }})" style="margin-top: 10px;">
+                <button type="submit">Usuń ten bukiet</button>
+            </form>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Nie masz jeszcze zapisanych bukietów.</p>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function deleteBouquet(event, bouquetId) {
+    event.preventDefault();
+    fetch(`/usun-bukiet/${bouquetId}/`, {
+        method: "POST",
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            location.reload();
+        } else {
+            alert(data.error || "Coś poszło nie tak.");
+        }
+    });
+}
+</script>
+{% endblock %}

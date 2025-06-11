@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Planowanie bukietu{% endblock %}
+
+{% block content %}
+<h2>Planer bukietu</h2>
+
+    <div id="message-area" style="
+    background-color: #e6ffe6;
+    border: 1px solid #66bb66;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    display: none;
+"></div>
+
+<form method="get">
+    {% csrf_token %}
+    <fieldset>
+        <legend>Wybierz kategorię:</legend>
+        {% for category in categories %}
+            <label>
+                <input type="checkbox" name="category" value="{{ category.id }}"
+                    {% if category.id in selected_ids %}checked{% endif %}>
+                {{ category.name }}
+            </label><br>
+        {% endfor %}
+    </fieldset>
+    <button type="submit">Filtruj</button>
+</form>
+
+<hr>
+
+<h3>Kwiaty:</h3>
+{% for flower in flowers %}
+    <div class="flower">
+        <h4>{{ flower.name }}</h4>
+        <p>{{ flower.meaning }}</p>
+        {% if flower.icon %}
+            <img src="{{ flower.icon.url }}" alt="{{ flower.name }}" width="80">
+        {% endif %}
+        <button onclick="addToBouquet({{ flower.id }})">Dodaj do bukietu</button>
+    </div>
+{% empty %}
+    <p>Brak pasujących kwiatów.</p>
+{% endfor %}
+
+<div id="message-area" style="color: green; font-weight: bold;"></div>
+
+<script>
+    function addToBouquet(flowerId) {
+        fetch("{% url 'add_to_bouquet' %}", {
+            method: "POST",
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: "flower_id=" + flowerId
+        })
+        .then(response => response.json())
+        .then(data => {
+            const msg = document.getElementById("message-area");
+            if (data.message) {
+                msg.textContent = data.message;
+                msg.style.display = "block";
+                setTimeout(() => {
+                    msg.style.display = "none";
+                }, 3000);
+            } else {
+                msg.textContent = "Błąd.";
+                msg.style.display = "block";
+            }
+        });
+    }
+</script>
+
+{% endblock %}
