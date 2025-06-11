@@ -1,16 +1,67 @@
-{% extends "base.html" %}
-
-{% block title %}Słownik Kwiatów{% endblock %}
-
+{% extends 'base.html' %}
 {% block content %}
-<h2>Słownik kwiatów</h2>
-{% for flower in flowers %}
-    <div class="flower">
-        <h3>{{ flower.name }}</h3>
-        <p>{{ flower.meaning }}</p>
-        {% if flower.icon %}
-            <img src="{{ flower.icon.url }}" alt="{{ flower.name }}" width="100">
-        {% endif %}
-    </div>
-{% endfor %}
+<style>
+    .dictionary-container {
+        background-color: #fdf7f4;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .dictionary-container h2 {
+        text-align: center;
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+    .letter-section {
+        margin-bottom: 3rem;
+    }
+    .letter-title {
+        font-size: 1.6rem;
+        margin: 2rem 0 1rem;
+        font-weight: bold;
+        border-bottom: 1px solid #d2b5ab;
+        padding-bottom: 0.4rem;
+    }
+    .flower-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.5rem;
+    }
+    .flower-entry {
+        background-color: #fff;
+        border-radius: 6px;
+        padding: 1rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .flower-entry h4 {
+        margin-top: 0;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem;
+    }
+    .flower-entry p {
+        font-size: 0.95rem;
+        margin-bottom: 0;
+    }
+</style>
+
+<div class="dictionary-container">
+    <h2>Słownik kwiatów</h2>
+
+    {% for letter, group in grouped_flowers.items %}
+        <div class="letter-section">
+            <div class="letter-title">{{ letter }}</div>
+            <div class="flower-grid">
+                {% for flower in group %}
+                    <div class="flower-entry">
+                        <h4>{{ flower.name }}</h4>
+                        <p>{{ flower.meaning }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% empty %}
+        <p>Brak kwiatów do wyświetlenia.</p>
+    {% endfor %}
+</div>
 {% endblock %}

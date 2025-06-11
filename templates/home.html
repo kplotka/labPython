@@ -1,19 +1,43 @@
-{% extends "base.html" %}
-
-{% block title %}Strona główna - Mowa Kwiatów{% endblock %}
-
+{% extends 'base.html' %}
 {% block content %}
-    <h2>Witamy w projekcie „Mowa Kwiatów”</h2>
+<style>
+    .intro {
+        text-align: center;
+        margin-top: 4rem;
+        padding: 2rem;
+        background-color: #fdf7f4;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .intro h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        margin-bottom: 1rem;
+    }
+    .intro p {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        max-width: 750px;
+        margin: 0 auto;
+    }
+    @media (max-width: 600px) {
+        .intro h2 {
+            font-size: 1.6rem;
+        }
+        .intro p {
+            font-size: 1rem;
+            padding: 0 1rem;
+        }
+    }
+</style>
+
+<div class="intro">
+    <h2>Powróćmy do romantyzmu języka kwiatów</h2>
     <p>
-        W epoce wiktoriańskiej kwiaty nie były tylko ozdobą – stanowiły sposób komunikacji.
-        Każdy kwiat niósł ze sobą znaczenie, uczucie lub wiadomość.
+        W czasach wiktoriańskich kwiaty służyły do przekazywania emocji, których nie wypadało wypowiedzieć na głos.
+        Każdy gatunek i jego kolor miał znaczenie – wyznanie miłości, przyjaźń, tęsknota, a nawet żal mogły zostać wyrażone bukietem.
+        <br><br>
+        Ta strona pomoże Ci skomponować analogowy, osobisty bukiet, którego symbolika przemówi mocniej niż słowa.
     </p>
-    <p>
-        Chcemy wrócić do tej subtelnej sztuki. 
-        Twórz z nami <strong>analogowe, znaczeniowe bukiety</strong>, które wyrażą to, co czujesz – bez słów,
-        bez trendów, bez algorytmów.
-    </p>
-    <p>
-        Skorzystaj ze <a href="{% url 'dictionary' %}">słownika kwiatów</a> lub przejdź do planowania bukietu!
-    </p>
+</div>
 {% endblock %}

@@ -1,6 +1,8 @@
 import random
-from django.shortcuts import render
+from collections import defaultdict
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
+from urllib.parse import urlencode
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .models import Flower, Category, SavedBouquet
@@ -12,23 +14,35 @@ def home(request):
 
 def dictionary(request):
     flowers = Flower.objects.all().order_by('name')
-    return render(request, 'dictionary.html', {'flowers': flowers})
+    grouped_flowers = defaultdict(list)
 
+    for flower in flowers:
+        first_letter = flower.name[0].upper()
+        grouped_flowers[first_letter].append(flower)
+
+    grouped_flowers = dict(sorted(grouped_flowers.items()))
+
+    return render(request, 'dictionary.html', {
+        'grouped_flowers': grouped_flowers
+    })
 
 def planner(request):
-    categories = Category.objects.all()
-    selected_ids = request.GET.getlist('category')
-    if selected_ids:
-        flowers = Flower.objects.filter(categories__id__in=selected_ids).distinct()
+    all_categories = Category.objects.all()
+    selected_categories = request.GET.getlist('category')
+
+    if selected_categories:
+        flowers = Flower.objects.filter(categories__name__in=selected_categories).distinct()
     else:
         flowers = Flower.objects.all()
 
+    message = request.GET.get("message", "")
+
     return render(request, 'planner.html', {
         'flowers': flowers,
-        'categories': categories,
-        'selected_ids': list(map(int, selected_ids)),
+        'all_categories': all_categories,
+        'selected_categories': selected_categories,
+        'message': message,
     })
-
 
 def add_to_bouquet(request):
     flower_id = request.POST.get('flower_id')
@@ -45,31 +59,23 @@ def add_to_bouquet(request):
         request.session['bouquet'] = bouquet
         request.session.modified = True
 
-    return JsonResponse({'message': 'Dodano do bukietu!'})
+    params = urlencode({'message': 'Dodano do bukietu'})
+    return redirect(f"/planer/?{params}")
+
+def remove_from_bouquet(request, flower_id):
+    if request.method == 'POST':
+        bouquet = request.session.get('bouquet', [])
+        bouquet = [fid for fid in bouquet if str(fid) != str(flower_id)]
+        request.session['bouquet'] = bouquet
+        request.session.modified = True
+        return redirect('bouquet')
 
 
-@require_POST
-def remove_from_bouquet(request):
-    flower_id = request.POST.get('flower_id')
-    try:
-        flower_id = int(flower_id)
-    except (ValueError, TypeError):
-        return JsonResponse({'error': 'Nieprawidłowe ID'}, status=400)
-
-    bouquet = request.session.get('bouquet', [])
-    bouquet = [int(f) for f in bouquet if int(f) != flower_id]
-    request.session['bouquet'] = bouquet
-    request.session.modified = True
-
-    return JsonResponse({'message': 'Usunięto z bukietu'})
-
-
-@require_POST
 def clear_bouquet(request):
-    request.session['bouquet'] = []
-    request.session.modified = True
-    return JsonResponse({'message': 'Bukiet wyczyszczony'})
-
+    if request.method == 'POST':
+        request.session['bouquet'] = []
+        request.session.modified = True
+        return redirect('bouquet')
 
 def bouquet(request):
     bouquet_ids = request.session.get('bouquet', [])
@@ -115,7 +121,10 @@ def delete_bouquet(request, bouquet_id):
     except SavedBouquet.DoesNotExist:
         return JsonResponse({'error': 'Nie znaleziono bukietu'}, status=404)
 
-def clear_bouquet(request):
-    request.session['bouquet'] = []
-    request.session.modified = True
-    return JsonResponse({'message': 'Bukiet wyczyszczony'})
+@login_required
+def load_bouquet(request, bouquet_id):
+    if request.method == 'POST':
+        bouquet = get_object_or_404(SavedBouquet, id=bouquet_id, user=request.user)
+        request.session['bouquet'] = [flower.id for flower in bouquet.flowers.all()]
+        request.session.modified = True
+        return redirect('bouquet')

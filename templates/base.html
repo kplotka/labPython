@@ -1,48 +1,82 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Mowa Kwiatów{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mowa Kwiatów</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Text&family=Playfair+Display:wght@500&display=swap">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     <style>
         body {
-            font-family: sans-serif;
-            max-width: 800px;
-            margin: auto;
-            padding: 30px;
+            background-color: #fffaf6;
+            color: #2e2e2e;
+            font-family: 'Crimson Text', serif;
+            margin: 0;
+            padding: 0;
         }
-        .flower {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 10px;
-            border-radius: 10px;
+        header {
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+        }
+        .site-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            margin: 0.2rem 0;
+        }
+        nav {
+            text-align: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e4d9d3;
+        }
+        nav a {
+            text-decoration: none;
+            color: #2e2e2e;
+            margin: 0 1.2rem;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #b88c9e;
+        }
+        .content {
+            max-width: 960px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+        }
+        img.logo {
+            width: 80px;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1><a href="/">Mowa Kwiatów</a></h1>
-        <nav>
-            <a href="{% url 'home' %}">Strona główna</a> |
-            <a href="{% url 'dictionary' %}">Słownik</a> |
-            <a href="{% url 'planner' %}">Planer bukietu</a> |
-            <a href="{% url 'bouquet' %}">Mój bukiet</a> |
-
-            {% if user.is_authenticated %}
-                <a href="{% url 'my_bouquets' %}">Moje bukiety</a> |
-                <a href="{% url 'logout' %}">Wyloguj</a>
-            {% else %}
-                <a href="{% url 'login' %}">Logowanie</a> |
-                <a href="{% url 'register' %}">Rejestracja</a>
-            {% endif %}
-        </nav>
-        <hr>
+        <h1 class="site-title">Mowa Kwiatów</h1>
     </header>
 
-    {% block content %}
-    {% endblock %}
+    <nav>
+        {% if user.is_authenticated %}
+            <a href="/">Strona Główna</a>
+            <a href="/planer/">Planer</a>
+            <a href="/slownik/">Słownik</a>
+            <a href="/bukiet/">Bukiet</a>
+            <a href="/moje-bukiety/">Moje bukiety</a>
+            <a href="/logout/">Wyloguj</a>
+        {% else %}
+            <a href="/">Strona Główna</a>
+            <a href="/planer/">Planer</a>
+            <a href="/slownik/">Słownik</a>
+            <a href="/bukiet/">Bukiet</a>
+            <a href="/login/">Logowanie</a>
+            <a href="/register/">Rejestracja</a>
+        {% endif %}
+    </nav>
 
-    {% block extra_scripts %}
-    {% endblock %}
-
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
 </body>
 </html>

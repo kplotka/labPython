@@ -1,78 +1,117 @@
-{% extends "base.html" %}
-
-{% block title %}Planowanie bukietu{% endblock %}
-
+{% extends 'base.html' %}
 {% block content %}
-<h2>Planer bukietu</h2>
-
-    <div id="message-area" style="
-    background-color: #e6ffe6;
-    border: 1px solid #66bb66;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    font-weight: bold;
-    display: none;
-"></div>
-
-<form method="get">
-    {% csrf_token %}
-    <fieldset>
-        <legend>Wybierz kategorię:</legend>
-        {% for category in categories %}
-            <label>
-                <input type="checkbox" name="category" value="{{ category.id }}"
-                    {% if category.id in selected_ids %}checked{% endif %}>
-                {{ category.name }}
-            </label><br>
-        {% endfor %}
-    </fieldset>
-    <button type="submit">Filtruj</button>
-</form>
-
-<hr>
-
-<h3>Kwiaty:</h3>
-{% for flower in flowers %}
-    <div class="flower">
-        <h4>{{ flower.name }}</h4>
-        <p>{{ flower.meaning }}</p>
-        {% if flower.icon %}
-            <img src="{{ flower.icon.url }}" alt="{{ flower.name }}" width="80">
-        {% endif %}
-        <button onclick="addToBouquet({{ flower.id }})">Dodaj do bukietu</button>
-    </div>
-{% empty %}
-    <p>Brak pasujących kwiatów.</p>
-{% endfor %}
-
-<div id="message-area" style="color: green; font-weight: bold;"></div>
-
-<script>
-    function addToBouquet(flowerId) {
-        fetch("{% url 'add_to_bouquet' %}", {
-            method: "POST",
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: "flower_id=" + flowerId
-        })
-        .then(response => response.json())
-        .then(data => {
-            const msg = document.getElementById("message-area");
-            if (data.message) {
-                msg.textContent = data.message;
-                msg.style.display = "block";
-                setTimeout(() => {
-                    msg.style.display = "none";
-                }, 3000);
-            } else {
-                msg.textContent = "Błąd.";
-                msg.style.display = "block";
-            }
-        });
+<style>
+    .planner-container {
+        max-width: 960px;
+        margin: 3rem auto;
+        background-color: #fdf7f4;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
-</script>
+    .planner-container h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    form {
+        margin-bottom: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+    }
+    label {
+        font-weight: bold;
+    }
+    select, button {
+        font-family: 'Crimson Text', serif;
+        font-size: 1rem;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .flower-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    .flower-box {
+        background-color: #fff;
+        border-radius: 6px;
+        padding: 1rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        text-align: center;
+    }
+    .flower-box h4 {
+        margin-bottom: 0.5rem;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.2rem;
+    }
+    .flower-box p {
+        font-size: 0.95rem;
+    }
+    .add-btn {
+        margin-top: 1rem;
+        background-color: #d8a7b1;
+        color: white;
+        border: none;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .add-btn:hover {
+        background-color: #b88c9e;
+    }
+    .message {
+        background-color: #eae3dc;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-weight: bold;
+    }
+</style>
 
+<div class="planner-container">
+    <h2>Wybierz kwiaty do swojego bukietu</h2>
+
+    {% if message %}
+        <div class="message">{{ message }}</div>
+    {% endif %}
+
+    <form method="get">
+        <div class="category-filter" style="text-align: center;">
+            <p><strong>Filtruj według kategorii:</strong></p>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem;">
+                {% for category in all_categories %}
+                    <label style="font-size: 0.95rem;">
+                        <input type="checkbox" name="category" value="{{ category.name }}"
+                            {% if category.name in selected_categories %}checked{% endif %}>
+                        {{ category.name }}
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+        <button type="submit">Zastosuj filtr</button>
+    </form>
+
+    <div class="flower-grid">
+        {% for flower in flowers %}
+            <div class="flower-box">
+                <h4>{{ flower.name }}</h4>
+                <p>{{ flower.meaning }}</p>
+                <form method="post" action="/add-to-bouquet/">
+                    {% csrf_token %}
+                    <input type="hidden" name="flower_id" value="{{ flower.id }}">
+                    <button type="submit" class="add-btn">Dodaj do bukietu</button>
+                </form>
+            </div>
+        {% empty %}
+            <p>Brak kwiatów dla wybranej kategorii.</p>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
