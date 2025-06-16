@@ -49,6 +49,45 @@
             opacity: 0.8;
             margin-bottom: 0.5rem;
         }
+        .message-container {
+              position: fixed;
+              top: 20px;
+              left: 50%;
+              transform: translateX(-50%);
+              z-index: 1000;
+            }
+
+            .alert {
+              background-color: #f3e5f5;
+              color: #333;
+              padding: 10px 20px;
+              border-radius: 8px;
+              margin: 5px 0;
+              box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .alert.success {
+              background-color: #dcedc8;
+            }
+
+            .alert.error {
+              background-color: #ffcdd2;
+            }
+            .logout-btn {
+                background: none;
+                border: none;
+                color: #2e2e2e;
+                font-weight: bold;
+                font-family: inherit;
+                font-size: inherit;
+                margin: 0 1.2rem;
+                cursor: pointer;
+                text-decoration: none;
+            }
+
+            .logout-btn:hover {
+                color: #b88c9e;
+            }
     </style>
 </head>
 <body>
@@ -63,7 +102,10 @@
             <a href="/slownik/">Słownik</a>
             <a href="/bukiet/">Bukiet</a>
             <a href="/moje-bukiety/">Moje bukiety</a>
-            <a href="/logout/">Wyloguj</a>
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Wyloguj</button>
+            </form>
         {% else %}
             <a href="/">Strona Główna</a>
             <a href="/planer/">Planer</a>
@@ -79,4 +121,11 @@
         {% endblock %}
     </div>
 </body>
+{% if messages %}
+  <div class="message-container">
+    {% for message in messages %}
+      <div class="alert {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+{% endif %}
 </html>

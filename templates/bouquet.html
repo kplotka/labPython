@@ -13,38 +13,7 @@
         font-size: 2rem;
         margin-bottom: 1.5rem;
     }
-    .bouquet-grid {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    .flower-card {
-        background-color: white;
-        padding: 1rem;
-        border-radius: 6px;
-        width: 140px;
-        text-align: center;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        transform: rotate(var(--rotate));
-    }
-    .flower-card img {
-        max-width: 80px;
-        margin-bottom: 0.5rem;
-    }
-    .flower-card p {
-        font-size: 0.9rem;
-        margin: 0.2rem 0;
-    }
-    .remove-btn {
-        background: none;
-        border: none;
-        color: #a55;
-        cursor: pointer;
-        font-size: 0.9rem;
-        margin-top: 0.3rem;
-    }
+
     .save-section {
         margin-bottom: 2rem;
     }
@@ -73,18 +42,53 @@
     .save-section button:hover {
         background-color: #b88c9e;
     }
-    .message {
-        color: green;
-        margin-bottom: 1rem;
+
+    .bouquet-display {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        gap: 0;
+        margin-top: 2rem;
+        position: relative;
+        height: 320px;
+    }
+    .flower-layer {
+        position: absolute;
+        bottom: 0;
+        text-align: center;
+    }
+    .flower-layer img {
+        max-height: 220px;
+    }
+    .flower-name {
+        font-size: 0.9rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .flower-info {
+        margin-top: 2rem;
+    }
+    .flower-info li {
+        margin-bottom: 0.4rem;
+        list-style: none;
+    }
+    .remove-btn {
+        background-color: #d8a7b1;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 0.2rem 0.5rem;
+        font-size: 0.8rem;
+        cursor: pointer;
+        margin-left: 1rem;
+    }
+    .remove-btn:hover {
+        background-color: #b88c9e;
     }
 </style>
 
 <div class="bouquet-wrap">
     <h2>Twój bukiet</h2>
-
-    {% if message %}
-        <div class="message">{{ message }}</div>
-    {% endif %}
 
     {% if bouquet|length > 0 %}
         {% if user.is_authenticated %}
@@ -97,26 +101,35 @@
         </div>
         {% endif %}
 
-        <div class="bouquet-grid">
-            {% for flower, rotate in bouquet %}
-                <div class="flower-card" style="--rotate: {{ rotate }}deg;">
-                    {% if flower.icon %}<img src="{{ flower.icon.url }}" alt="{{ flower.name }}">{% endif %}
-                    <p><strong>{{ flower.name }}</strong></p>
-                    <p>{{ flower.meaning }}</p>
-                    <form method="post" action="/usun-z-bukietu/{{ flower.id }}/">
-                        {% csrf_token %}
-                        <button type="submit" class="remove-btn">Usuń</button>
-                    </form>
+        <div class="bouquet-display">
+            {% for item in bouquet %}
+                <div class="flower-layer"
+                     style="transform: translateX({{ item.translate }}px) rotate({{ item.rotation|add:"0" }}deg); z-index:{{ forloop.counter }};">
+                    <div class="flower-name">{{ item.flower.name }}</div>
+                    {% if item.flower.icon %}
+                        <img src="{{ item.flower.icon.url }}" alt="{{ item.flower.name }}">
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>
+
+        <ul class="flower-info">
+            {% for item in bouquet %}
+                <li><strong>{{ item.flower.name }}</strong> – {{ item.flower.meaning }}
+                    <form method="post" action="/usun-z-bukietu/{{ item.flower.id }}/" class="remove-form" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="remove-btn">Usuń</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
 
         <form method="post" action="{% url 'clear_bouquet' %}" style="margin-top: 2rem;">
             {% csrf_token %}
             <button type="submit" class="save-section button">Wyczyść bukiet</button>
         </form>
     {% else %}
-        <p>Twój bukiet jest pusty. Dodaj kwiaty w <a href="{% url 'planner' %}">planerze</a></p>
+        <p style="text-align: center;">Twój bukiet jest pusty. Dodaj kwiaty w <a href="{% url 'planner' %}">planerze</a></p>
     {% endif %}
 </div>
 {% endblock %}

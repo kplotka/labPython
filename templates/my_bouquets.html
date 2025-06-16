@@ -1,87 +1,105 @@
 {% extends 'base.html' %}
+
 {% block content %}
+<div class="container">
+    <h2 class="page-title">Twoje zapisane bukiety</h2>
+    {% for bouquet in bouquets %}
+        <div class="bouquet-card">
+            <h4>{{ bouquet.name }}</h4>
+
+            <div class="bouquet-display">
+                {% for item in bouquet.bouquet_data %}
+                    <div class="flower-layer"
+                         style="position: absolute;
+                                left: 50%;
+                                transform: translateX({{ item.translate }}px) rotate({{ item.rotation }}deg);
+                                z-index: {{ forloop.counter }};">
+                        <div class="flower-name">{{ item.flower.name }}</div>
+                        {% if item.flower.icon %}
+                            <img src="{{ item.flower.icon.url }}" alt="{{ item.flower.name }}">
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="flower-meaning-list">
+                {% for item in bouquet.bouquet_data %}
+                    <p><strong>{{ item.flower.name }}</strong> – {{ item.flower.meaning }}</p>
+                {% endfor %}
+            </div>
+
+            <form method="post" action="{% url 'delete_bouquet' bouquet.id %}">
+                {% csrf_token %}
+                <button type="submit" class="remove-btn">Usuń</button>
+            </form>
+        </div>
+    {% empty %}
+        <p class="no-bouquets">Nie masz jeszcze zapisanych bukietów.</p>
+    {% endfor %}
+</div>
+
 <style>
-    .bouquet-list {
-        background-color: #fdf7f4;
-        padding: 2rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-    .bouquet-list h2 {
+    .container {
         text-align: center;
-        font-family: 'Playfair Display', serif;
-        font-size: 2rem;
-        margin-bottom: 2rem;
+        padding: 20px;
     }
-    .bouquet-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 1.5rem;
+
+    .page-title {
+        font-size: 28px;
+        margin-bottom: 30px;
     }
+
     .bouquet-card {
-        background-color: #fff;
-        border-radius: 6px;
-        padding: 1.2rem;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        background-color: white;
+        padding: 30px 20px;
+        margin: 30px auto;
+        border-radius: 12px;
+        max-width: 700px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        position: relative;
+    }
+
+    .bouquet-display {
+        position: relative;
+        height: 400px;
+        margin-bottom: 20px;
+    }
+
+    .flower-layer {
+        position: absolute;
+        bottom: 0;
         text-align: center;
     }
-    .bouquet-card h4 {
-        margin-top: 0;
-        font-family: 'Playfair Display', serif;
-        font-size: 1.2rem;
+
+    .flower-name {
+        margin-bottom: 5px;
+        font-size: 14px;
     }
-    .flower-icons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        justify-content: center;
-        margin-top: 1rem;
+
+    .flower-meaning-list {
+        text-align: left;
+        margin-top: 10px;
     }
-    .flower-icons img {
-        width: 60px;
-        height: auto;
-    }
-    .bouquet-card form {
-        margin-top: 1rem;
-    }
-    .bouquet-card button {
-        background-color: #d8a7b1;
-        color: white;
+
+    .remove-btn {
+        margin-top: 20px;
+        background-color: #e6b8c6;
         border: none;
+        padding: 8px 14px;
         border-radius: 4px;
-        padding: 0.4rem 0.8rem;
-        font-size: 0.9rem;
-        margin: 0 0.3rem;
+        color: #333;
         cursor: pointer;
     }
-    .bouquet-card button:hover {
-        background-color: #b88c9e;
+
+    .no-bouquets {
+        margin-top: 40px;
+        font-style: italic;
+        color: #666;
+    }
+
+    img {
+        max-height: 300px;
+        width: auto;
     }
 </style>
-
-<div class="bouquet-list">
-    <h2>Twoje zapisane bukiety</h2>
-
-    {% if bouquets %}
-        <div class="bouquet-grid">
-            {% for bouquet in bouquets %}
-                <div class="bouquet-card">
-                    <h4>{{ bouquet.name }}</h4>
-                    <div class="flower-icons">
-                        {% for flower in bouquet.flowers.all %}
-                            <img src="{{ flower.icon.url }}" alt="{{ flower.name }}"
-                                 style="transform: rotate({{ forloop.counter0|add:"-1"|add:"3"|random }}deg);" />
-                        {% endfor %}
-                    </div>
-                    <form method="post" action="{% url 'delete_bouquet' bouquet.id %}">
-                        {% csrf_token %}
-                        <button type="submit">🗑️ Usuń</button>
-                    </form>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p style="text-align: center;">Nie masz jeszcze żadnych zapisanych bukietów 🌿</p>
-    {% endif %}
-</div>
 {% endblock %}

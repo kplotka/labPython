@@ -2,6 +2,8 @@ import random
 from collections import defaultdict
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
+from django.contrib import messages
+from django.shortcuts import redirect
 from urllib.parse import urlencode
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -83,9 +85,17 @@ def bouquet(request):
     flowers = Flower.objects.filter(id__in=bouquet_ids)
 
     bouquet_data = []
-    for flower in flowers:
-        rotation = random.randint(-10, 10)
-        bouquet_data.append((flower, rotation))
+    count = len(flowers)
+    for i, flower in enumerate(flowers):
+        center_index = (count - 1) / 2
+        offset = i - center_index
+        translate = offset * 40
+        rotation = offset * 12
+        bouquet_data.append({
+            'flower': flower,
+            'translate': translate,
+            'rotation': rotation
+        })
 
     return render(request, 'bouquet.html', {'bouquet': bouquet_data})
 
@@ -98,18 +108,50 @@ def save_bouquet(request):
     flowers = Flower.objects.filter(id__in=bouquet_ids)
 
     if not name:
-        return JsonResponse({'error': 'Podaj nazwę bukietu'}, status=400)
+        messages.error(request, "Podaj nazwę bukietu")
+        return redirect("bouquet")
 
     if flowers.exists():
         bouquet = SavedBouquet.objects.create(user=request.user, name=name)
         bouquet.flowers.set(flowers)
-        return JsonResponse({'message': 'Bukiet zapisany!'})
-    return JsonResponse({'error': 'Bukiet jest pusty'}, status=400)
+        messages.success(request, "Bukiet zapisany!")
+        request.session['bouquet'] = []
+        return redirect("my_bouquets")
+
+    messages.error(request, "Nie można zapisać pustego bukietu")
+    return redirect("bouquet")
+
 
 @login_required
 def my_bouquets(request):
     bouquets = SavedBouquet.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'my_bouquets.html', {'bouquets': bouquets})
+    bouquet_data_list = []
+
+    for bouquet in bouquets:
+        flowers = list(bouquet.flowers.all())
+        count = len(flowers)
+        bouquet_data = []
+
+        for i, flower in enumerate(flowers):
+            center_index = (count - 1) / 2
+            offset = i - center_index
+            translate = offset * 35
+            rotation = offset * 12
+            bouquet_data.append({
+                'flower': flower,
+                'translate': translate,
+                'rotation': rotation
+            })
+
+        bouquet_data_list.append({
+            'name': bouquet.name,
+            'id': bouquet.id,
+            'bouquet_data': bouquet_data
+        })
+
+    return render(request, 'my_bouquets.html', {
+        'bouquets': bouquet_data_list
+    })
 
 @require_POST
 @login_required
@@ -117,9 +159,10 @@ def delete_bouquet(request, bouquet_id):
     try:
         bouquet = SavedBouquet.objects.get(id=bouquet_id, user=request.user)
         bouquet.delete()
-        return JsonResponse({'message': 'Bukiet usunięty'})
+        messages.success(request, "Bukiet usunięty")
     except SavedBouquet.DoesNotExist:
-        return JsonResponse({'error': 'Nie znaleziono bukietu'}, status=404)
+        messages.error(request, "Nie znaleziono bukietu")
+    return redirect("my_bouquets")
 
 @login_required
 def load_bouquet(request, bouquet_id):
